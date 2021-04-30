@@ -1,6 +1,7 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import scr.get_class as get_class
 import scr.bot_data as bot_data
+import scr.bobr_nlp as nlp
 
 updater = Updater(token = bot_data.token, use_context=True)
 
@@ -23,10 +24,18 @@ def img(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text= f'Похоже это {class_name}' + '\n' + msg)
 
+def mesag(update, context):
+    qaschen = update.message.text
+    ansver = nlp.get_ansver(qaschen)
+    context.bot.send_message(chat_id=update.effective_chat.id, text=ansver)
+
+
 
 start_handler = CommandHandler('start', start)
 img_handler = MessageHandler(Filters.photo & (~Filters.command), img)
+mesag_handler = MessageHandler(Filters.text & (~Filters.command), mesag)
 dispatcher.add_handler(img_handler)
 dispatcher.add_handler(start_handler)
+dispatcher.add_handler(mesag_handler)
 
 updater.start_polling()
